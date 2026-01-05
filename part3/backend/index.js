@@ -83,7 +83,11 @@ app.get("/api/persons/:id", (request, response, next) => {
 
 // POST
 app.post("/api/persons", (request, response, next) => {
-  const { name, number } = request.body;
+  const body = request.body;
+  /* if (body.content === undefined) {
+    return response.status(400).json({ error: "content missing" });
+  } */
+  const { name, number } = body;
 
   if (!name) {
     response.status(400).json({ error: "name is required" });
@@ -119,7 +123,11 @@ app.put("/api/persons/:id", (request, response, next) => {
   }
 
   const person = { name, number };
-  Person.findByIdAndUpdate(id, person, { new: true, runValidators: true })
+  Person.findByIdAndUpdate(id, person, {
+    new: true,
+    runValidators: true,
+    context: "query",
+  })
     .then((updatedPerson) => {
       response.status(202).json(updatedPerson);
     })
