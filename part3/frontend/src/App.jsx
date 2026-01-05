@@ -73,6 +73,9 @@ const App = () => {
         .then((data) => {
           setPersons([...persons, data]);
           createNotification("success", `Added ${newName}`);
+        })
+        .catch((error) => {
+          createNotification("error", error.response.data.error);
         });
     }
 
