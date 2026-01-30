@@ -1,3 +1,20 @@
+const Blog = require("../models/blog");
+
+const initialBlogs = [
+  {
+    title: "title1",
+    author: "author1",
+    url: "url",
+    likes: 1,
+  },
+  {
+    title: "title2",
+    author: "author2",
+    url: "url",
+    likes: 2,
+  },
+];
+
 const dummy = (blogs) => {
   return 1;
 };
@@ -10,7 +27,7 @@ const totalLikes = (blogs) => {
 
 const favoriteBlog = (blogs) => {
   const sortedBlogs = blogs.sort((a, b) =>
-    a.likes > b.likes ? -1 : a.likes < b.likes ? 1 : 0
+    a.likes > b.likes ? -1 : a.likes < b.likes ? 1 : 0,
   );
 
   return sortedBlogs[0] || null;
@@ -32,7 +49,7 @@ const mostBlogs = (blogs) => {
   });
 
   return authors.sort((a, b) =>
-    a.blogs > b.blogs ? -1 : a.blogs < b.blogs ? 1 : 0
+    a.blogs > b.blogs ? -1 : a.blogs < b.blogs ? 1 : 0,
   )[0];
 };
 
@@ -52,14 +69,21 @@ const mostLikes = (blogs) => {
   });
 
   return authors.sort((a, b) =>
-    a.likes > b.likes ? -1 : a.likes < b.likes ? 1 : 0
+    a.likes > b.likes ? -1 : a.likes < b.likes ? 1 : 0,
   )[0];
 };
 
+const blogsInDb = async () => {
+  const blogs = await Blog.find({});
+  return blogs.map((blog) => blog.toJSON());
+};
+
 module.exports = {
+  initialBlogs,
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
   mostLikes,
+  blogsInDb,
 };

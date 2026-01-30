@@ -1,8 +1,10 @@
-const { test, after } = require("node:test");
+const { describe, test, after } = require("node:test");
+const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
 const Blog = require("../models/blog");
+const listHelper = require("../utils/list_helpers");
 
 const api = supertest(app);
 
@@ -99,6 +101,19 @@ test("blog without title or url is not added", async () => {
   if (blogsAtEnd.length !== blogsAtStart.length) {
     throw new Error("Blog without title or url not be added");
   }
+});
+
+describe("deletion of a blog", () => {
+  test("succeeds with status code 204 if id is valid", async () => {
+    const blogsAtStart = await listHelper.blogsInDb();
+    const blogToDelete = blogsAtStart[0];
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+    const blogsAtEnd = await listHelper.blogsInDb();
+
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
+  });
 });
 
 after(async () => {
