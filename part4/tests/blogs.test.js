@@ -76,6 +76,31 @@ test("if likes property is missing, it defaults to 0", async () => {
   }
 });
 
+test("blog without title or url is not added", async () => {
+  const blogsAtStart = await Blog.find({});
+
+  const newBlogNoTitle = {
+    author: "author anon",
+    url: "url",
+    likes: 2,
+  };
+
+  await api.post("/api/blogs").send(newBlogNoTitle).expect(400);
+
+  const newBlogNoUrl = {
+    title: "no url",
+    author: "author anon",
+    likes: 2,
+  };
+
+  await api.post("/api/blogs").send(newBlogNoUrl).expect(400);
+
+  const blogsAtEnd = await Blog.find({});
+  if (blogsAtEnd.length !== blogsAtStart.length) {
+    throw new Error("Blog without title or url not be added");
+  }
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
