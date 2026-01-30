@@ -27,7 +27,7 @@ test("blog posts have id property", async () => {
   }
 });
 
-test("add a blog", async () => {
+test("add a blog and check if blog list increases", async () => {
   const blogsAtStart = await Blog.find({});
   const initialLength = blogsAtStart.length;
 
@@ -41,13 +41,38 @@ test("add a blog", async () => {
   await api
     .post("/api/blogs")
     .send(newBlog)
-    .expect(201) // Full Stack Open espera status 201 Created
+    .expect(201)
     .expect("Content-Type", /application\/json/);
 
   const blogsAtEnd = await Blog.find({});
 
   if (blogsAtEnd.length !== initialLength + 1) {
     throw new Error("blogs not increase");
+  }
+});
+
+test("if likes property is missing, it defaults to 0", async () => {
+  const blogsAtStart = await Blog.find({});
+
+  const newBlog = {
+    title: "title no likes",
+    author: "authornolikes",
+    url: "url",
+  };
+
+  const response = await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  if (response.body.likes !== 0) {
+    throw new Error("likes is not 0 by default");
+  }
+
+  const blogsAtEnd = await Blog.find({});
+  if (blogsAtEnd.length !== blogsAtStart.length + 1) {
+    throw new Error("Number of blogs did not increase");
   }
 });
 
