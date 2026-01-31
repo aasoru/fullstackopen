@@ -30,7 +30,7 @@ test("blog posts have id property", async () => {
 });
 
 test("add a blog and check if blog list increases", async () => {
-  const blogsAtStart = await Blog.find({});
+  const blogsAtStart = await listHelper.blogsInDb();
   const initialLength = blogsAtStart.length;
 
   const newBlog = {
@@ -46,7 +46,7 @@ test("add a blog and check if blog list increases", async () => {
     .expect(201)
     .expect("Content-Type", /application\/json/);
 
-  const blogsAtEnd = await Blog.find({});
+  const blogsAtEnd = await listHelper.blogsInDb();
 
   if (blogsAtEnd.length !== initialLength + 1) {
     throw new Error("blogs not increase");
@@ -54,7 +54,7 @@ test("add a blog and check if blog list increases", async () => {
 });
 
 test("if likes property is missing, it defaults to 0", async () => {
-  const blogsAtStart = await Blog.find({});
+  const blogsAtStart = await listHelper.blogsInDb();
 
   const newBlog = {
     title: "title no likes",
@@ -72,14 +72,14 @@ test("if likes property is missing, it defaults to 0", async () => {
     throw new Error("likes is not 0 by default");
   }
 
-  const blogsAtEnd = await Blog.find({});
+  const blogsAtEnd = await listHelper.blogsInDb();
   if (blogsAtEnd.length !== blogsAtStart.length + 1) {
     throw new Error("Number of blogs did not increase");
   }
 });
 
 test("blog without title or url is not added", async () => {
-  const blogsAtStart = await Blog.find({});
+  const blogsAtStart = await listHelper.blogsInDb();
 
   const newBlogNoTitle = {
     author: "author anon",
@@ -97,7 +97,7 @@ test("blog without title or url is not added", async () => {
 
   await api.post("/api/blogs").send(newBlogNoUrl).expect(400);
 
-  const blogsAtEnd = await Blog.find({});
+  const blogsAtEnd = await listHelper.blogsInDb();
   if (blogsAtEnd.length !== blogsAtStart.length) {
     throw new Error("Blog without title or url not be added");
   }
@@ -113,6 +113,38 @@ describe("deletion of a blog", () => {
     const blogsAtEnd = await listHelper.blogsInDb();
 
     assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
+  });
+});
+
+describe("update blog", () => {
+  test("update likes on a blog", async () => {
+    const blogsAtStart = await listHelper.blogsInDb();
+    const blogToUpdate = blogsAtStart[0];
+
+    const updatedData = {
+      title: blogToUpdate.title,
+      author: blogToUpdate.author,
+      url: blogToUpdate.url,
+      likes: blogToUpdate.likes + 1,
+    };
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updatedData)
+      .expect(202)
+      .expect("Content-Type", /application\/json/);
+
+    if (response.body.likes !== blogToUpdate.likes + 1) {
+      throw new Error("Likes were not updated correctly");
+    }
+
+    const blogsAtEnd = await listHelper.blogsInDb();
+
+    const updatedBlog = blogsAtEnd.find((b) => b.id === blogToUpdate.id);
+
+    if (updatedBlog.likes !== blogToUpdate.likes + 1) {
+      throw new Error("Likes in DB were not updated correctly");
+    }
   });
 });
 
