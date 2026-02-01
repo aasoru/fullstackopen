@@ -8,6 +8,8 @@ const listHelper = require("../utils/list_helpers");
 
 const api = supertest(app);
 
+let token;
+
 test("blogs are returned as json", async () => {
   await api
     .get("/api/blogs")
@@ -29,7 +31,43 @@ test("blog posts have id property", async () => {
   }
 });
 
-test("add a blog and check if blog list increases", async () => {
+test("fail on adding a blog if user is not authenticated", async () => {
+  const blogsAtStart = await listHelper.blogsInDb();
+  const initialLength = blogsAtStart.length;
+
+  const newBlog = {
+    title: "new Blog",
+    author: "author1235434",
+    url: "url",
+    likes: 2,
+  };
+
+  const response = await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(401)
+    .expect("Content-Type", /application\/json/);
+
+  const blogsAtEnd = await listHelper.blogsInDb();
+
+  if (blogsAtEnd.length !== initialLength) {
+    throw new Error("blogs not the same");
+  }
+});
+
+test("add a blog and check if blog list increases (with login)", async () => {
+  const loginResponse = await api
+    .post("/api/login")
+    .send({
+      username: process.env.TEST_USERNAME,
+      password: process.env.TEST_PASSWORD,
+    })
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  token = loginResponse.body.token;
+  if (!token) throw new Error("no token");
+
   const blogsAtStart = await listHelper.blogsInDb();
   const initialLength = blogsAtStart.length;
 
@@ -42,6 +80,7 @@ test("add a blog and check if blog list increases", async () => {
 
   await api
     .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
@@ -64,6 +103,7 @@ test("if likes property is missing, it defaults to 0", async () => {
 
   const response = await api
     .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
@@ -87,7 +127,11 @@ test("blog without title or url is not added", async () => {
     likes: 2,
   };
 
-  await api.post("/api/blogs").send(newBlogNoTitle).expect(400);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newBlogNoTitle)
+    .expect(400);
 
   const newBlogNoUrl = {
     title: "no url",
@@ -95,7 +139,11 @@ test("blog without title or url is not added", async () => {
     likes: 2,
   };
 
-  await api.post("/api/blogs").send(newBlogNoUrl).expect(400);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newBlogNoUrl)
+    .expect(400);
 
   const blogsAtEnd = await listHelper.blogsInDb();
   if (blogsAtEnd.length !== blogsAtStart.length) {
@@ -106,9 +154,12 @@ test("blog without title or url is not added", async () => {
 describe("deletion of a blog", () => {
   test("succeeds with status code 204 if id is valid", async () => {
     const blogsAtStart = await listHelper.blogsInDb();
-    const blogToDelete = blogsAtStart[0];
+    const blogToDelete = blogsAtStart[blogsAtStart.length - 1];
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(204);
 
     const blogsAtEnd = await listHelper.blogsInDb();
 
