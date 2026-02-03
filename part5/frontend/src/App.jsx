@@ -3,15 +3,19 @@ import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
+import Notification from "./components/Notification";
+
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -26,8 +30,9 @@ const App = () => {
     }
   }, []);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErrorMessage(null);
 
     try {
       const user = await loginService.login({
@@ -42,7 +47,37 @@ const App = () => {
       window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
       blogService.setToken(user.token);
     } catch (exception) {
-      setErrorMessage("Wrong credentials");
+      setErrorMessage("Wrong username or password");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
+  const handleCreateBlog = async (e) => {
+    e.preventDefault();
+    setErrorMessage(null);
+
+    try {
+      const newBlog = {
+        title,
+        author,
+        url,
+      };
+
+      await blogService.create(newBlog);
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+      setSuccessMessage(`a new blog ${title} by ${author} added`);
+
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+
+      blogService.getAll().then((blogs) => setBlogs(blogs));
+    } catch (exception) {
+      setErrorMessage("Blog not created");
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
@@ -77,7 +112,7 @@ const App = () => {
   );
 
   const blogForm = () => (
-    <form>
+    <form onSubmit={handleCreateBlog}>
       <div>
         title
         <input
@@ -96,11 +131,23 @@ const App = () => {
           onChange={({ target }) => setAuthor(target.value)}
         />
       </div>
+      <div>
+        url
+        <input
+          type="text"
+          value={url}
+          name="Url"
+          onChange={({ target }) => setUrl(target.value)}
+        />
+      </div>
+      <button type="submit">create</button>
     </form>
   );
 
   return (
     <div>
+      <Notification type="success" message={successMessage} />
+      <Notification type="error" message={errorMessage} />
       {user === null ? (
         loginForm()
       ) : (
