@@ -18,10 +18,6 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
-
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
@@ -59,35 +55,19 @@ const App = () => {
     }
   };
 
-  const handleCreateBlog = async (e) => {
-    e.preventDefault();
-    setErrorMessage(null);
+  const addBlog = (blogObject) => {
+    blogService.create(blogObject).then((returnedBlog) => {
+      setBlogs(blogs.concat(returnedBlog));
+    });
 
-    try {
-      const newBlog = {
-        title,
-        author,
-        url,
-      };
+    setSuccessMessage(
+      `a new blog ${blogObject.title} by ${blogObject.author} added`,
+    );
+    blogFormRef.current.toggleVisibility();
 
-      await blogService.create(newBlog);
-      setTitle("");
-      setAuthor("");
-      setUrl("");
-      setSuccessMessage(`a new blog ${title} by ${author} added`);
-      blogFormRef.current.toggleVisibility();
-
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
-
-      blogService.getAll().then((blogs) => setBlogs(blogs));
-    } catch (exception) {
-      setErrorMessage("Blog not created");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
-    }
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
   };
 
   const loginForm = () => (
@@ -109,15 +89,7 @@ const App = () => {
       hideButtonLabel="cancel"
       ref={blogFormRef}
     >
-      <BlogForm
-        handleSubmit={handleCreateBlog}
-        handleTitleChange={({ target }) => setTitle(target.value)}
-        handleAuthorChange={({ target }) => setAuthor(target.value)}
-        handleUrlChange={({ target }) => setUrl(target.value)}
-        title={title}
-        author={author}
-        url={url}
-      />
+      <BlogForm createBlog={addBlog} />
     </Togglable>
   );
 
