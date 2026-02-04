@@ -91,7 +91,7 @@ const App = () => {
   };
 
   const loginForm = () => (
-    <Togglable buttonLabel="login">
+    <Togglable showButtonLabel="login" hideButtonLabel="cancel">
       <h2>Log in to application</h2>
       <LoginForm
         handleSubmit={handleLogin}
@@ -104,7 +104,11 @@ const App = () => {
   );
 
   const blogForm = () => (
-    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+    <Togglable
+      showButtonLabel="new blog"
+      hideButtonLabel="cancel"
+      ref={blogFormRef}
+    >
       <BlogForm
         handleSubmit={handleCreateBlog}
         handleTitleChange={({ target }) => setTitle(target.value)}
