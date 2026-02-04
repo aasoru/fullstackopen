@@ -11,6 +11,13 @@ const Blog = ({ blog }) => {
       url: blog.url,
     });
   };
+
+  const deleteBlog = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      await blogService.destroy(blog.id);
+    }
+    return;
+  };
   return (
     <div className="blogItem">
       {blog.title}
@@ -23,6 +30,7 @@ const Blog = ({ blog }) => {
           <button onClick={() => likeBlog(blog)}>like</button>
         </p>
         <p>{blog.author}</p>
+        <button onClick={() => deleteBlog(blog)}>delete</button>
       </Togglable>
     </div>
   );
