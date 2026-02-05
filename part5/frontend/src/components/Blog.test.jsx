@@ -74,7 +74,5 @@ test("calls the like handler twice when like button is clicked twice", async () 
   await user.click(likeButton);
   await user.click(likeButton);
 
-  console.log(handleLike.mock.calls);
-
   expect(handleLike.mock.calls).toHaveLength(2);
 });
