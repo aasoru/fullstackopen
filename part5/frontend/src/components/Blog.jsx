@@ -19,17 +19,17 @@ const Blog = ({ blog }) => {
     return;
   };
   return (
-    <div className="blogItem">
-      {blog.title}
+    <div className="blogItem blog">
+      <span className="blogTitle">{blog.title}</span>{" "}
+      <span className="blogAuthor">{blog.author}</span>
       <Togglable buttonLabel="view">
-        <p>
+        <p className="blog-url">
           <a href={blog.url}>{blog.url}</a>
         </p>
-        <p>
+        <p className="blog-likes">
           Likes: {blog.likes}{" "}
           <button onClick={() => likeBlog(blog)}>like</button>
         </p>
-        <p>{blog.author}</p>
         <button onClick={() => deleteBlog(blog)}>delete</button>
       </Togglable>
     </div>
