@@ -1,17 +1,7 @@
 import Togglable from "./Togglable";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog }) => {
-  const likeBlog = async (blog) => {
-    await blogService.update(blog.id, {
-      user: blog.user,
-      likes: blog.likes + 1,
-      author: blog.author,
-      title: blog.title,
-      url: blog.url,
-    });
-  };
-
+const Blog = ({ blog, handleLike }) => {
   const deleteBlog = async (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
       await blogService.destroy(blog.id);
@@ -28,7 +18,9 @@ const Blog = ({ blog }) => {
         </p>
         <p className="blog-likes">
           Likes: {blog.likes}{" "}
-          <button onClick={() => likeBlog(blog)}>like</button>
+          <button onClick={() => handleLike(blog)} className="button-like">
+            like
+          </button>
         </p>
         <button onClick={() => deleteBlog(blog)}>delete</button>
       </Togglable>
