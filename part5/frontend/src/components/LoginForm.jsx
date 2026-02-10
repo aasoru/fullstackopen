@@ -6,7 +6,7 @@ const LoginForm = ({
   password,
 }) => {
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} data-testid="login-form">
       <div>
         username
         <input
