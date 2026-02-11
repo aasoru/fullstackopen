@@ -26,6 +26,7 @@ const BlogForm = ({ createBlog }) => {
           value={title}
           name="Title"
           placeholder="write title here"
+          data-testid="title"
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
@@ -36,6 +37,7 @@ const BlogForm = ({ createBlog }) => {
           value={author}
           name="Author"
           placeholder="write author here"
+          data-testid="author"
           onChange={(e) => setAuthor(e.target.value)}
         />
       </div>
@@ -46,6 +48,7 @@ const BlogForm = ({ createBlog }) => {
           value={url}
           name="Url"
           placeholder="write url here"
+          data-testid="url"
           onChange={(e) => setUrl(e.target.value)}
         />
       </div>
