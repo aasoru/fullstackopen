@@ -17,7 +17,7 @@ const Blog = ({ blog, handleLike }) => {
           <a href={blog.url}>{blog.url}</a>
         </p>
         <p className="blog-likes">
-          Likes: {blog.likes}{" "}
+          Likes: <span className="blog-likes-number">{blog.likes} </span>
           <button onClick={() => handleLike(blog)} className="button-like">
             like
           </button>

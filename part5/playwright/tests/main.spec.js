@@ -3,6 +3,10 @@ const { test, expect, beforeEach, describe } = require("@playwright/test");
 
 import { loginWith, createBlog } from "./helper";
 
+const title = "title test";
+const author = "playwright";
+const url = "https://url.dev";
+
 describe("Blog app", () => {
   beforeEach(async ({ page, request }) => {
     await request.post("/api/testing/reset");
@@ -50,10 +54,6 @@ describe("Blog app", () => {
     });
 
     test("a new blog can be created", async ({ page }) => {
-      const title = "title test";
-      const author = "playwright";
-      const url = "https://url.dev";
-
       await createBlog(page, {
         title,
         author,
@@ -62,6 +62,22 @@ describe("Blog app", () => {
       await expect(
         page.getByText(`a new blog ${title} by ${author}`),
       ).toBeVisible();
+    });
+
+    test("new blog can be edited", async ({ page }) => {
+      const blog = page.locator(".blog").filter({
+        has: page.getByText(title),
+      });
+
+      await blog.getByRole("button", { name: "show" }).click();
+
+      const likesLocator = blog.locator(".blog-likes-number");
+
+      const likesBefore = Number(await likesLocator.textContent());
+
+      await blog.getByRole("button", { name: "like" }).click();
+
+      await expect(likesLocator).toHaveText(String(likesBefore + 1));
     });
   });
 });
