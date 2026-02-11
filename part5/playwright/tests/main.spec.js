@@ -49,7 +49,7 @@ describe("Blog app", () => {
       await loginWith(page, "username", "password");
     });
 
-    test("a new note can be created", async ({ page }) => {
+    test("a new blog can be created", async ({ page }) => {
       const title = "title test";
       const author = "playwright";
       const url = "https://url.dev";
