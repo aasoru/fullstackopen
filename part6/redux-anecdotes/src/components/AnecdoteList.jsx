@@ -4,9 +4,17 @@ import { vote } from "../reducers/anecdoteReducer";
 const AnecdoteList = () => {
   const dispatch = useDispatch();
 
-  const anecdotes = useSelector((state) =>
-    [...state].sort((a, b) => b.votes - a.votes),
-  );
+  const filter = useSelector((state) => state.filter);
+
+  const anecdotes = useSelector((state) => {
+    // si tu store es solo el array de anecdotes:
+    const allAnecdotes = state.anecdotes || state; // ajusta según tu store
+    return [...allAnecdotes]
+      .filter((anecdote) =>
+        anecdote.content.toLowerCase().includes(filter.toLowerCase()),
+      )
+      .sort((a, b) => b.votes - a.votes);
+  });
 
   return (
     <div>
