@@ -108,4 +108,25 @@ describe("Blog app", () => {
       await expect(deleteButton).toBeVisible();
     });
   });
+
+  test("blogs are ordered by likes descending", async ({ page }) => {
+    const blogs = page.locator(".blog");
+
+    const count = await blogs.count();
+    for (let i = 0; i < count; i++) {
+      await blogs.nth(i).getByRole("button", { name: "show" }).click();
+    }
+
+    const likesArray = [];
+    for (let i = 0; i < count; i++) {
+      const likesText = await blogs
+        .nth(i)
+        .locator(".blog-likes-number")
+        .textContent();
+      likesArray.push(Number(likesText.trim()));
+    }
+
+    const sorted = [...likesArray].sort((a, b) => b - a);
+    expect(likesArray).toEqual(sorted);
+  });
 });
