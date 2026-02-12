@@ -96,5 +96,16 @@ describe("Blog app", () => {
 
       await expect(blog).toHaveCount(0);
     });
+
+    test("only the creator can see the delete button", async ({ page }) => {
+      const blog = page.locator(".blog").filter({
+        has: page.getByText(title),
+      });
+
+      await blog.getByRole("button", { name: "show" }).click();
+
+      const deleteButton = blog.getByRole("button", { name: "delete" });
+      await expect(deleteButton).toBeVisible();
+    });
   });
 });
