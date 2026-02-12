@@ -70,7 +70,8 @@ const App = () => {
     }, 5000);
   };
 
-  const likeBlog = async (blog) => {
+  const likeBlog = async (e, blog) => {
+    e.preventDefault();
     await blogService.update(blog.id, {
       user: blog.user,
       likes: blog.likes + 1,
@@ -78,6 +79,18 @@ const App = () => {
       title: blog.title,
       url: blog.url,
     });
+
+    await blogService.getAll().then((blogs) => setBlogs(blogs));
+  };
+
+  const deleteBlog = async (e, blog) => {
+    e.preventDefault();
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      await blogService.destroy(blog.id);
+
+      setBlogs(blogs.filter((b) => b.id !== blog.id));
+    }
+    return;
   };
 
   const loginForm = () => (
@@ -130,7 +143,12 @@ const App = () => {
 
       <h2>blogs</h2>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} handleLike={likeBlog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          handleLike={likeBlog}
+          handleDelete={deleteBlog}
+        />
       ))}
     </div>
   );

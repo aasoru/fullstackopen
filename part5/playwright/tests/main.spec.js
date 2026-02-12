@@ -79,5 +79,22 @@ describe("Blog app", () => {
 
       await expect(likesLocator).toHaveText(String(likesBefore + 1));
     });
+
+    test("new blog can be deleted", async ({ page }) => {
+      const blog = page.locator(".blog").filter({
+        has: page.getByText(title),
+      });
+
+      await blog.getByRole("button", { name: "show" }).click();
+
+      page.once("dialog", async (dialog) => {
+        expect(dialog.type()).toBe("confirm");
+        await dialog.accept();
+      });
+
+      await blog.getByRole("button", { name: "delete" }).click();
+
+      await expect(blog).toHaveCount(0);
+    });
   });
 });

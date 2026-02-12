@@ -1,13 +1,6 @@
 import Togglable from "./Togglable";
-import blogService from "../services/blogs";
 
-const Blog = ({ blog, handleLike }) => {
-  const deleteBlog = async (blog) => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      await blogService.destroy(blog.id);
-    }
-    return;
-  };
+const Blog = ({ blog, handleLike, handleDelete }) => {
   return (
     <div className="blogItem blog">
       <span className="blogTitle">{blog.title}</span>{" "}
@@ -18,11 +11,11 @@ const Blog = ({ blog, handleLike }) => {
         </p>
         <p className="blog-likes">
           Likes: <span className="blog-likes-number">{blog.likes} </span>
-          <button onClick={() => handleLike(blog)} className="button-like">
+          <button onClick={(e) => handleLike(e, blog)} className="button-like">
             like
           </button>
         </p>
-        <button onClick={() => deleteBlog(blog)}>delete</button>
+        <button onClick={(e) => handleDelete(e, blog)}>delete</button>
       </Togglable>
     </div>
   );
