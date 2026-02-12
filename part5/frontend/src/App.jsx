@@ -146,6 +146,7 @@ const App = () => {
         <Blog
           key={blog.id}
           blog={blog}
+          user={user}
           handleLike={likeBlog}
           handleDelete={deleteBlog}
         />
