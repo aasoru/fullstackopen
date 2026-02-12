@@ -7,8 +7,7 @@ const AnecdoteList = () => {
   const filter = useSelector((state) => state.filter);
 
   const anecdotes = useSelector((state) => {
-    // si tu store es solo el array de anecdotes:
-    const allAnecdotes = state.anecdotes || state; // ajusta según tu store
+    const allAnecdotes = state.anecdotes || state;
     return [...allAnecdotes]
       .filter((anecdote) =>
         anecdote.content.toLowerCase().includes(filter.toLowerCase()),
