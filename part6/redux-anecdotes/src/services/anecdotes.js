@@ -18,7 +18,7 @@ const createNew = async (content) => {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to create note");
+    throw new Error("Failed to create anecdote");
   }
 
   return await response.json();
