@@ -1,23 +1,28 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
 import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
 
+import { getAnecdotes, updateAnecdote } from './requests'
+
 const App = () => {
+  const queryClient = useQueryClient()
   const handleVote = (anecdote) => {
-    console.log('vote')
+    updateAnecdoteMutation.mutate({ ...anecdote, votes: anecdote.votes + 1 })
   }
 
   const result = useQuery({
     queryKey: ['anecdotes'],
-    queryFn: async () => {
-      const response = await fetch('http://localhost:3001/anecdotes')
-      if (!response.ok) {
-        throw new Error('Failed to fetch notes')
-      }
-      return await response.json()
-    },
+    queryFn: async () => getAnecdotes(),
+    refetchOnWindowFocus: false,
     retry: false,
+  })
+
+  const updateAnecdoteMutation = useMutation({
+    mutationFn: updateAnecdote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
+    },
   })
 
   console.log(JSON.parse(JSON.stringify(result)))
