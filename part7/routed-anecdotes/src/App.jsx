@@ -1,5 +1,7 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useMatch, useNavigate } from "react-router-dom";
 import { useState } from "react";
+
+import Notification from "./components/Notification";
 
 const Menu = () => {
   const padding = {
@@ -25,11 +27,26 @@ const AnecdoteList = ({ anecdotes }) => (
     <h2>Anecdotes</h2>
     <ul>
       {anecdotes.map((anecdote) => (
-        <li key={anecdote.id}>{anecdote.content}</li>
+        <li key={anecdote.id}>
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>
       ))}
     </ul>
   </div>
 );
+
+const Anecdote = ({ anecdote }) => {
+  if (!anecdote) return null;
+  return (
+    <div>
+      <h3>{anecdote.content}</h3>
+      <div>has {anecdote.votes}</div>
+      <div>
+        for more info see <a href={anecdote.info}>{anecdote.info}</a>
+      </div>
+    </div>
+  );
+};
 
 const About = () => (
   <div>
@@ -114,6 +131,9 @@ const CreateNew = (props) => {
 };
 
 const App = () => {
+  const match = useMatch("/anecdotes/:id");
+  const navigate = useNavigate();
+
   const [anecdotes, setAnecdotes] = useState([
     {
       content: "If it hurts, do it more often",
@@ -131,11 +151,22 @@ const App = () => {
     },
   ]);
 
+  const anecdote = match
+    ? anecdotes.find((anecdote) => anecdote.id === Number(match.params.id))
+    : null;
+
   const [notification, setNotification] = useState("");
 
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000);
     setAnecdotes(anecdotes.concat(anecdote));
+
+    setNotification(`a new anecdote '${anecdote.content}' created!`);
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+
+    navigate("/");
   };
 
   const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
@@ -155,27 +186,15 @@ const App = () => {
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
-      {/* <AnecdoteList anecdotes={anecdotes} />
-      <About />
-      <CreateNew addNew={addNew} /> */}
+      <Notification notification={notification} />
 
       <Routes>
-        {/* <Route
+        <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
+        <Route
           path="/anecdotes/:id"
           element={<Anecdote anecdote={anecdote} />}
-        /> */}
-        {/* <Route
-          path="/anecdotes"
-          element={<AnecdoteList anecdotes={anecdotes} />}
-        /> */}
-
-        <Route path="/create" element={<CreateNew addNew={addNew} />} />
-        {/* <Route
-          path="/users"
-          element={user ? <Users /> : <Navigate replace to="/login" />}
         />
-        <Route path="/login" element={<Login onLogin={login} />} /> */}
-        <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
+        <Route path="/create" element={<CreateNew addNew={addNew} />} />
         <Route path="/about" element={<About />} />
       </Routes>
 
