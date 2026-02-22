@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import NotificationContext from './NotificationContext';
+import { UserContext } from './UserContext';
 
 import Blog from './components/Blog';
 import blogService from './services/blogs';
@@ -15,6 +16,8 @@ import Togglable from './components/Togglable';
 
 const App = () => {
   const { notificationDispatch } = useContext(NotificationContext);
+  const { user, userDispatch } = useContext(UserContext);
+
   const blogFormRef = useRef();
 
   const queryClient = useQueryClient();
@@ -26,13 +29,12 @@ const App = () => {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      userDispatch({ type: 'LOGIN', payload: user });
       blogService.setToken(user.token);
     }
   }, []);
@@ -45,7 +47,7 @@ const App = () => {
         username,
         password,
       });
-      setUser(user);
+      userDispatch({ type: 'LOGIN', payload: user });
       setUsername('');
       setPassword('');
 
@@ -153,8 +155,9 @@ const App = () => {
               {user.name} logged-in{' '}
               <button
                 onClick={() => {
-                  setUser(null);
+                  userDispatch({ type: 'LOGOUT' });
                   window.localStorage.removeItem('loggedBlogappUser');
+                  blogService.setToken(user.token);
                 }}
               >
                 logout
