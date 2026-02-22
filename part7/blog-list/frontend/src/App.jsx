@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useContext } from 'react';
 
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import NotificationContext from './NotificationContext';
 
 import Blog from './components/Blog';
@@ -15,14 +17,16 @@ const App = () => {
   const { notificationDispatch } = useContext(NotificationContext);
   const blogFormRef = useRef();
 
-  const [blogs, setBlogs] = useState([]);
+  const queryClient = useQueryClient();
+
+  const { data: blogs = [], isLoading } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+  });
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
@@ -60,42 +64,54 @@ const App = () => {
     }
   };
 
-  const addBlog = (blogObject) => {
-    blogService.create(blogObject).then((returnedBlog) => {
-      setBlogs(blogs.concat(returnedBlog));
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (returnedBlog) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      notificationDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: `a new blog ${returnedBlog.title} by ${returnedBlog.author} added`,
+      });
+      setTimeout(() => {
+        notificationDispatch({ type: 'CLEAR_NOTIFICATION' });
+      }, 5000);
+      blogFormRef.current.toggleVisibility();
+    },
+  });
+
+  const addBlog = (blogObject) => newBlogMutation.mutate(blogObject);
+
+  const updateBlogMutation = useMutation({
+    mutationFn: ({ id, updatedBlog }) => blogService.update(id, updatedBlog),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+    },
+  });
+
+  const likeBlog = (e, blog) => {
+    e.preventDefault();
+
+    updateBlogMutation.mutate({
+      id: blog.id,
+      updatedBlog: {
+        ...blog,
+        likes: blog.likes + 1,
+      },
     });
-
-    notificationDispatch({
-      type: 'SET_NOTIFICATION',
-      payload: `a new blog ${blogObject.title} by ${blogObject.author} added`,
-    });
-
-    setTimeout(() => {
-      notificationDispatch({ type: 'CLEAR_NOTIFICATION' });
-    }, 5000);
-
-    blogFormRef.current.toggleVisibility();
   };
 
-  const likeBlog = async (e, blog) => {
-    e.preventDefault();
-    await blogService.update(blog.id, {
-      user: blog.user,
-      likes: blog.likes + 1,
-      author: blog.author,
-      title: blog.title,
-      url: blog.url,
-    });
+  const deleteBlogMutation = useMutation({
+    mutationFn: blogService.destroy,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+    },
+  });
 
-    await blogService.getAll().then((blogs) => setBlogs(blogs));
-  };
-
-  const deleteBlog = async (e, blog) => {
+  const deleteBlog = (e, blog) => {
     e.preventDefault();
+
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      await blogService.destroy(blog.id);
-
-      setBlogs(blogs.filter((b) => b.id !== blog.id));
+      deleteBlogMutation.mutate(blog.id);
     }
     return;
   };
@@ -122,6 +138,8 @@ const App = () => {
       <BlogForm createBlog={addBlog} />
     </Togglable>
   );
+
+  if (isLoading) return <div>loading data...</div>;
 
   return (
     <div>
