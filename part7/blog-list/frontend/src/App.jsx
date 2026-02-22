@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import NotificationContext from './NotificationContext';
-import { UserContext } from './UserContext';
+import UserContext from './UserContext';
 
 import Blog from './components/Blog';
 import blogService from './services/blogs';
