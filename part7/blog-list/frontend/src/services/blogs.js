@@ -1,5 +1,5 @@
-import axios from "axios";
-const baseUrl = "/api/blogs";
+import axios from 'axios';
+const baseUrl = '/api/blogs';
 
 let token = null;
 
@@ -12,6 +12,11 @@ const getAll = () => {
   return request.then((response) => {
     return response.data.sort((a, b) => b.likes - a.likes);
   });
+};
+
+const getById = async (id) => {
+  const response = await axios.get(`${baseUrl}/${id}`);
+  return response.data;
 };
 
 const create = async (newObject) => {
@@ -38,4 +43,4 @@ const destroy = (id) => {
     .then((response) => response.data);
 };
 
-export default { getAll, create, update, destroy, setToken };
+export default { getAll, getById, create, update, destroy, setToken };

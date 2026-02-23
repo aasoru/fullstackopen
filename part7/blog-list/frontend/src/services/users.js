@@ -8,4 +8,11 @@ const getAll = () => {
   });
 };
 
-export default { getAll };
+const getById = (id) => {
+  const request = axios.get(`${baseUrl}/${id}`);
+  return request.then((response) => {
+    return response.data;
+  });
+};
+
+export default { getAll, getById };
