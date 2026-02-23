@@ -1,31 +1,32 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-const blogsRouter = require("express").Router();
-const middleware = require("../utils/middleware");
-const Blog = require("../models/blog");
-const User = require("../models/user");
+const blogsRouter = require('express').Router();
+const middleware = require('../utils/middleware');
+const Blog = require('../models/blog');
+const User = require('../models/user');
 
-blogsRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({}).populate("user"); // test populate
+blogsRouter.get('/', async (request, response) => {
+  const blogs = await Blog.find({}).populate('user'); // test populate
   response.json(blogs);
 });
 
-blogsRouter.get("/:id", async (request, response) => {
+blogsRouter.get('/:id', async (request, response) => {
   const id = request.params.id;
 
   try {
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findById(id).populate('user');
+
     if (blog) {
       response.json(blog);
     } else {
       response.status(404).end();
     }
   } catch (error) {
-    response.status(400).json({ error: "malformatted id" });
+    response.status(400).json({ error: 'malformatted id' });
   }
 });
 
-blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   const body = request.body;
 
   const user = request.user;
@@ -33,7 +34,7 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
   const blog = new Blog({
     title: body.title,
     author: body.author,
-    url: body.url || "",
+    url: body.url || '',
     likes: body.likes || 0,
     user: user._id,
   });
@@ -46,7 +47,7 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
 });
 
 blogsRouter.delete(
-  "/:id",
+  '/:id',
   middleware.userExtractor,
   async (request, response) => {
     const user = request.user;
@@ -58,25 +59,25 @@ blogsRouter.delete(
     }
 
     if (blog.user.toString() !== user.id.toString()) {
-      return response.status(403).json({ error: "operation not permitted" });
+      return response.status(403).json({ error: 'operation not permitted' });
     }
 
     await Blog.findByIdAndDelete(request.params.id);
     response.status(204).end();
-  },
+  }
 );
 
-blogsRouter.put("/:id", async (request, response) => {
+blogsRouter.put('/:id', async (request, response) => {
   const id = request.params.id;
   const { title, author, url, likes } = request.body;
 
   if (!title) {
-    response.status(400).json({ error: "title is required" });
+    response.status(400).json({ error: 'title is required' });
     return;
   }
 
   if (!url) {
-    response.status(400).json({ error: "url is required" });
+    response.status(400).json({ error: 'url is required' });
     return;
   }
 
