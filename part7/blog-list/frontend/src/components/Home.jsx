@@ -55,7 +55,7 @@ const Home = () => {
 
   return (
     <>
-      {user && <p>{blogForm()}</p>}
+      {user && <>{blogForm()}</>}
 
       <h2>blogs</h2>
       {blogs.map((blog) => (
