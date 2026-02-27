@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 const BlogForm = ({ createBlog }) => {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [url, setUrl] = useState('');
 
   const addBlog = (e) => {
     e.preventDefault();
@@ -13,15 +13,16 @@ const BlogForm = ({ createBlog }) => {
       url,
     });
 
-    setTitle("");
-    setAuthor("");
-    setUrl("");
+    setTitle('');
+    setAuthor('');
+    setUrl('');
   };
   return (
-    <form onSubmit={addBlog} className="blogForm">
-      <div>
-        title
+    <form onSubmit={addBlog}>
+      <div class="mb-3">
+        <label className="form-label">title</label>
         <input
+          className="form-control"
           type="text"
           value={title}
           name="Title"
@@ -31,8 +32,9 @@ const BlogForm = ({ createBlog }) => {
         />
       </div>
       <div>
-        author
+        <label className="form-label">author</label>
         <input
+          className="form-control"
           type="text"
           value={author}
           name="Author"
@@ -42,17 +44,22 @@ const BlogForm = ({ createBlog }) => {
         />
       </div>
       <div>
-        url
-        <input
-          type="text"
-          value={url}
-          name="Url"
-          placeholder="write url here"
-          data-testid="url"
-          onChange={(e) => setUrl(e.target.value)}
-        />
+        <label className="form-label">
+          url
+          <input
+            className="form-control"
+            type="text"
+            value={url}
+            name="Url"
+            placeholder="write url here"
+            data-testid="url"
+            onChange={(e) => setUrl(e.target.value)}
+          />
+        </label>
       </div>
-      <button type="submit">create</button>
+      <button className="btn btn-primary" type="submit">
+        create
+      </button>
     </form>
   );
 };

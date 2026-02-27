@@ -47,7 +47,9 @@ const Home = () => {
       hideButtonLabel="cancel"
       ref={blogFormRef}
     >
-      <BlogForm createBlog={addBlog} />
+      <div className="card">
+        <BlogForm createBlog={addBlog} />
+      </div>
     </Togglable>
   );
 
@@ -58,16 +60,20 @@ const Home = () => {
       {user && <>{blogForm()}</>}
 
       <h2>blogs</h2>
-      {blogs.map((blog) => (
-        <div className="blogItem blog">
-          <span className="blogTitle">
-            <Link to={`/blogs/${blog.id}`}>
-              <span className="blogTitle">{blog.title}</span>{' '}
-              <span className="blogAuthor">{blog.author}</span>
-            </Link>
-          </span>
-        </div>
-      ))}
+      <div class="container text-center">
+        {blogs.map((blog) => (
+          <div className="blog card">
+            <div className="card-body">
+              <span className="blogTitle card-title">
+                <Link to={`/blogs/${blog.id}`}>
+                  <span className="blogTitle">{blog.title}</span>{' '}
+                  <span className="blogAuthor">{blog.author}</span>
+                </Link>
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
     </>
   );
 };

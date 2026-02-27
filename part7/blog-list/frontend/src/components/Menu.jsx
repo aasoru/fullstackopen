@@ -58,25 +58,35 @@ const Home = () => {
   );
 
   return (
-    <div>
-      <Link to="/">blogs</Link> | <Link to="/users">users</Link> |{' '}
-      {user === null ? (
-        loginForm()
-      ) : (
-        <>
-          {user.name} logged-in{' '}
-          <button
-            onClick={() => {
-              userDispatch({ type: 'LOGOUT' });
-              window.localStorage.removeItem('loggedBlogappUser');
-              blogService.setToken(user.token);
-            }}
-          >
-            logout
-          </button>
-        </>
-      )}
-    </div>
+    <header className="mb-auto">
+      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <Link to="/" className="navbar-brand">
+            blogs
+          </Link>
+          <Link to="/users" className="navbar-brand">
+            users
+          </Link>
+          {user === null ? (
+            loginForm()
+          ) : (
+            <>
+              {user.name} logged-in{' '}
+              <button
+                className="mx-2 btn btn-secondary"
+                onClick={() => {
+                  userDispatch({ type: 'LOGOUT' });
+                  window.localStorage.removeItem('loggedBlogappUser');
+                  blogService.setToken(user.token);
+                }}
+              >
+                logout
+              </button>
+            </>
+          )}
+        </div>
+      </nav>
+    </header>
   );
 };
 

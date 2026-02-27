@@ -6,14 +6,7 @@ const Notification = () => {
 
   if (!notification) return null;
 
-  const style = {
-    border: 'solid',
-    padding: 10,
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  return <div style={style}>{notification}</div>;
+  return <div className="alert alert-primary my-2">{notification}</div>;
 };
 
 export default Notification;

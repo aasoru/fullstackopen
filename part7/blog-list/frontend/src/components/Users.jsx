@@ -12,9 +12,11 @@ const Users = () => {
   if (isLoading) return <div>loading users...</div>;
 
   return (
-    <div>
-      <h2>Users</h2>
-      <table>
+    <div className="card">
+      <div class="card-body">
+        <h2 class="card-title">Users</h2>
+      </div>
+      <table class="table">
         <thead>
           <tr>
             <th>name</th>

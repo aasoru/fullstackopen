@@ -72,40 +72,57 @@ const Blog = () => {
 
   return (
     <div>
-      <h2>{blog.title}</h2>
+      <div className="card">
+        <div class="card-body">
+          <h2 class="card-title">{blog.title}</h2>
 
-      <p>
-        <a href={blog.url} target="_blank" rel="noreferrer">
-          {blog.url}
-        </a>
-      </p>
+          <div class="card-link">
+            <a href={blog.url} target="_blank" rel="noreferrer">
+              {blog.url}
+            </a>
+          </div>
 
-      <p>
-        {blog.likes} likes
-        <button onClick={handleLike}>like</button>
-      </p>
+          <p>
+            {blog.likes} likes
+            <button className="btn btn-primary" onClick={handleLike}>
+              like
+            </button>
+          </p>
 
-      <p>added by {blog.user?.name}</p>
+          <p>added by {blog.user?.name}</p>
 
-      {blog.user?.id === user?.id && (
-        <button onClick={handleDelete}>delete</button>
-      )}
+          {blog.user?.id === user?.id && (
+            <button className="btn btn-danger" onClick={handleDelete}>
+              delete
+            </button>
+          )}
+        </div>
+      </div>
 
-      <h3>comments</h3>
+      <div className="card">
+        <div class="card-body">
+          <h3>comments</h3>
 
-      <form onSubmit={handleComment}>
-        <input
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-        />
-        <button type="submit">add comment</button>
-      </form>
+          <form onSubmit={handleComment}>
+            <input
+              className="form-control"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+            />
+            <button type="submit" className="btn btn-primary">
+              add comment
+            </button>
+          </form>
 
-      <ul>
-        {blog.comments?.map((comment, index) => (
-          <li key={index}>{comment}</li>
-        ))}
-      </ul>
+          <ul class="list-group">
+            {blog.comments?.map((comment, index) => (
+              <li key={index} class="list-group-item">
+                {comment}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
