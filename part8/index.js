@@ -94,9 +94,17 @@ let books = [
 ];
 
 const typeDefs = `
+  type Book {
+    title: String!
+    author: String!
+    published: Int!
+    genres: [String!]!
+  }
+
   type Query {
     bookCount: Int!
     authorCount: Int!
+    allBooks: [Book!]!
   }
 `;
 
@@ -108,6 +116,8 @@ const resolvers = {
       const uniqueAuthors = new Set(books.map((b) => b.author));
       return uniqueAuthors.size;
     },
+
+    allBooks: () => books,
   },
 };
 
