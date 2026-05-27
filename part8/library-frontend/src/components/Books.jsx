@@ -4,19 +4,21 @@ import { ALL_BOOKS } from "../queries";
 
 const Books = (props) => {
   const [genre, setGenre] = useState(null);
-  const result = useQuery(ALL_BOOKS);
+  const allBooksResult = useQuery(ALL_BOOKS);
+  const result = useQuery(ALL_BOOKS, {
+    variables: { genre },
+  });
 
   if (!props.show) {
     return null;
   }
 
-  if (result.loading) {
+  if (result.loading || allBooksResult.loading) {
     return <div>loading...</div>;
   }
 
-  const books = result.data.allBooks;
-  const genres = [...new Set(books.flatMap((b) => b.genres))];
-  const filtered = genre ? books.filter((b) => b.genres.includes(genre)) : books;
+  const filtered = result.data.allBooks;
+  const genres = [...new Set(allBooksResult.data.allBooks.flatMap((b) => b.genres))];
 
   return (
     <div>
